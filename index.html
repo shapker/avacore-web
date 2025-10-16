@@ -3,193 +3,769 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shapker Bot</title>
+    <title>Shapker Bot - Панель управления</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: var(--tg-theme-bg-color, #ffffff);
+            --bg-secondary: var(--tg-theme-secondary-bg-color, #f3f4f6);
+            --text-primary: var(--tg-theme-text-color, #1f2937);
+            --text-secondary: var(--tg-theme-hint-color, #6b7280);
+            --button-color: var(--tg-theme-button-color, #6366f1);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            --border-color: var(--tg-theme-section-bg-color, #e5e7eb);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        
+
         body {
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            padding: 16px;
-            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        
+
+        .container {
+            max-width: 100%;
+            padding: 0;
+        }
+
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 24px;
-            padding: 20px 0;
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        
-        .card {
-            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
-            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
             padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .btn {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 12px;
-            padding: 16px 20px;
-            font-size: 16px;
-            font-weight: 500;
-            width: 100%;
-            margin: 8px 0;
-            cursor: pointer;
-            transition: opacity 0.2s;
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
         }
-        
-        .btn:hover {
-            opacity: 0.9;
-        }
-        
-        .btn-secondary {
-            background: var(--tg-theme-section-bg-color, #e9ecef);
-            color: var(--tg-theme-text-color, #000000);
-        }
-        
-        .status {
+
+        .user-info {
             display: flex;
             align-items: center;
-            margin: 12px 0;
+            gap: 12px;
+            margin-bottom: 15px;
         }
-        
-        .status-dot {
-            width: 12px;
-            height: 12px;
+
+        .avatar {
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            margin-right: 12px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
-        
-        .status-active {
-            background: #31b545;
+
+        .user-details h2 {
+            font-size: 18px;
+            margin-bottom: 4px;
         }
-        
-        .status-inactive {
-            background: #ff3b30;
+
+        .user-details p {
+            opacity: 0.9;
+            font-size: 14px;
         }
-        
-        .feature-list {
-            list-style: none;
-            margin: 16px 0;
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
         }
-        
-        .feature-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--tg-theme-hint-color, #6c757d);
+
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            backdrop-filter: blur(10px);
         }
-        
-        .feature-list li:last-child {
-            border-bottom: none;
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .action-btn {
+            background: var(--bg-secondary);
+            border: none;
+            padding: 16px 12px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .action-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateX(5px);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .feature-content h4 {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .feature-content p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            padding: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-text {
+            font-size: 11px;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* Utility Classes */
+        .badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge.warning {
+            background: var(--warning);
+        }
+
+        .badge.danger {
+            background: var(--danger);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🤖 Shapker Bot</h1>
-        <p>Управление вашим бизнес-ботом</p>
-    </div>
-
-    <div class="card">
-        <h3>📊 Статус системы</h3>
-        <div class="status">
-            <div class="status-dot status-active"></div>
-            <span>Бот активен</span>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="user-details">
+                    <h2 id="user-name">Shapker Bot</h2>
+                    <p id="user-status">🟢 Онлайн</p>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="balance">150 ₽</div>
+                    <div class="stat-label">Баланс</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="active-chats">12</div>
+                    <div class="stat-label">Активные чаты</div>
+                </div>
+            </div>
         </div>
-        <div class="status">
-            <div class="status-dot status-active"></div>
-            <span>Баланс: <strong id="balance">150 руб.</strong></span>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn" onclick="openModal('settings-modal')">
+                    <div class="action-icon">⚙️</div>
+                    <div class="action-text">Настройки</div>
+                </button>
+                <button class="action-btn" onclick="openModal('balance-modal')">
+                    <div class="action-icon">💳</div>
+                    <div class="action-text">Пополнить</div>
+                </button>
+                <button class="action-btn" onclick="openModal('stats-modal')">
+                    <div class="action-icon">📊</div>
+                    <div class="action-text">Статистика</div>
+                </button>
+                <button class="action-btn" onclick="openHelp()">
+                    <div class="action-icon">❓</div>
+                    <div class="action-text">Помощь</div>
+                </button>
+            </div>
+
+            <!-- Features Section -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-star"></i>
+                    Основные функции
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Автоответчик</h4>
+                            <p>Умные ответы в бизнес-чатах</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Защита сообщений</h4>
+                            <p>Сохранение и мониторинг</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Магазин товаров</h4>
+                            <p>Управление продажами</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Аналитика</h4>
+                            <p>Подробная статистика</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscription Status -->
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-crown"></i>
+                    Статус подписки
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: var(--warning);">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="feature-content" style="flex: 1;">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div>
+                                <h4>Премиум доступ</h4>
+                                <p>Активен до 15.12.2024</p>
+                            </div>
+                            <span class="badge">АКТИВЕН</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">
+                            Осталось 25 дней
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-text">Главная</div>
+            </div>
+            <div class="nav-item" onclick="openModal('settings-modal')">
+                <div class="nav-icon">⚙️</div>
+                <div class="nav-text">Настройки</div>
+            </div>
+            <div class="nav-item" onclick="openModal('stats-modal')">
+                <div class="nav-icon">📊</div>
+                <div class="nav-text">Аналитика</div>
+            </div>
+            <div class="nav-item" onclick="openHelp()">
+                <div class="nav-icon">❓</div>
+                <div class="nav-text">Помощь</div>
+            </div>
         </div>
     </div>
 
-    <div class="card">
-        <h3>🎯 Основные функции</h3>
-        <ul class="feature-list">
-            <li>✅ Автоответчик</li>
-            <li>✅ Сохранение сообщений</li>
-            <li>✅ Управление бизнес-чатами</li>
-            <li>✅ Магазин товаров</li>
-        </ul>
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">⚙️ Настройки бота</h3>
+                <button class="close-modal" onclick="closeModal('settings-modal')">×</button>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Автоответчик</h4>
+                        <p>Включить умные ответы</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-save"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Сохранение сообщений</h4>
+                        <p>Записывать удаленные сообщения</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Уведомления</h4>
+                        <p>Присылать оповещения</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="action-btn" style="margin-top: 20px; width: 100%;" onclick="saveSettings()">
+                Сохранить настройки
+            </button>
+        </div>
     </div>
 
-    <button class="btn" onclick="openSettings()">⚙️ Настройки бота</button>
-    <button class="btn" onclick="openBalance()">💰 Пополнить баланс</button>
-    <button class="btn btn-secondary" onclick="openHelp()">❓ Помощь</button>
-    <button class="btn btn-secondary" onclick="closeApp()">✖️ Закрыть</button>
+    <!-- Balance Modal -->
+    <div class="modal" id="balance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">💳 Пополнение баланса</h3>
+                <button class="close-modal" onclick="closeModal('balance-modal')">×</button>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="font-size: 48px; margin-bottom: 10px;">💰</div>
+                <h3 style="margin-bottom: 10px;">Текущий баланс: 150 ₽</h3>
+                <p style="color: var(--text-secondary);">Пополните баланс для доступа к премиум функциям</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card" onclick="selectPlan(100)">
+                    <div class="feature-content">
+                        <h4>100 рублей</h4>
+                        <p>Базовый доступ на 1 месяц</p>
+                    </div>
+                    <div style="font-size: 18px; font-weight: bold; color: var(--primary);">
+                        100 ₽
+                    </div>
+                </div>
+                
+                <div class="feature-card" onclick="selectPlan(250)" style="border-color: var(--primary);">
+                    <div class="feature-content">
+                        <h4>250 рублей</h4>
+                        <p>Премиум доступ на 3 месяца</p>
+                    </div>
+                    <div style="font-size: 18px; font-weight: bold; color: var(--primary);">
+                        250 ₽
+                    </div>
+                </div>
+                
+                <div class="feature-card" onclick="selectPlan(500)">
+                    <div class="feature-content">
+                        <h4>500 рублей</h4>
+                        <p>Полный доступ на 6 месяцев</p>
+                    </div>
+                    <div style="font-size: 18px; font-weight: bold; color: var(--primary);">
+                        500 ₽
+                    </div>
+                </div>
+            </div>
+            
+            <button class="action-btn" style="margin-top: 20px; width: 100%; background: var(--success); color: white;" 
+                    onclick="processPayment()">
+                <i class="fas fa-lock"></i> Безопасная оплата
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="modal" id="stats-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📊 Статистика</h3>
+                <button class="close-modal" onclick="closeModal('stats-modal')">×</button>
+            </div>
+            
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr 1fr; margin: 20px 0;">
+                <div class="stat-card" style="background: var(--bg-secondary); color: var(--text-primary);">
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-label">Сообщений</div>
+                </div>
+                <div class="stat-card" style="background: var(--bg-secondary); color: var(--text-primary);">
+                    <div class="stat-value">89%</div>
+                    <div class="stat-label">Активность</div>
+                </div>
+                <div class="stat-card" style="background: var(--bg-secondary); color: var(--text-primary);">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Чаты</div>
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h4>📈 Активность за неделю</h4>
+                    <p>Пиковая активность в 14:00-16:00</p>
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h4>👥 Топ чаты</h4>
+                    <p>@business_chat, @support_group</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Инициализация Telegram Web App
+        // Telegram Web App initialization
         let tg = window.Telegram.WebApp;
         
-        // Расширяем на весь экран
+        // Initialize the app
         tg.expand();
-        
-        // Включаем подтверждение закрытия
         tg.enableClosingConfirmation();
-        
-        // Получаем данные пользователя
-        const user = tg.initDataUnsafe.user;
-        
-        // Показываем кнопку назад
         tg.BackButton.show();
         
-        // Обновляем интерфейс с данными пользователя
+        // Get user data
+        const user = tg.initDataUnsafe.user;
+        
+        // Update UI with user data
         if (user) {
-            document.getElementById('balance').textContent = '150 руб.'; // Заглушка
+            document.getElementById('user-name').textContent = user.first_name || 'Пользователь';
+            if (user.username) {
+                document.getElementById('user-status').textContent = `@${user.username}`;
+            }
         }
         
-        // Функции для кнопок
-        function openSettings() {
-            tg.showPopup({
-                title: 'Настройки',
-                message: 'Раздел настроек в разработке',
-                buttons: [{ type: 'ok' }]
-            });
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            tg.BackButton.onClick(() => closeModal(modalId));
         }
         
-        function openBalance() {
-            tg.showPopup({
-                title: 'Пополнение баланса',
-                message: 'Для пополнения баланса обратитесь к администратору @username',
-                buttons: [{ type: 'ok' }]
-            });
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            tg.BackButton.offClick(() => closeModal(modalId));
         }
         
         function openHelp() {
-            tg.openTelegramLink('https://t.me/your_bot?start=help');
+            tg.openTelegramLink('https://t.me/shapkerbot?start=help');
         }
         
-        function closeApp() {
-            tg.close();
+        function selectPlan(amount) {
+            const cards = document.querySelectorAll('#balance-modal .feature-card');
+            cards.forEach(card => card.style.borderColor = 'var(--border-color)');
+            event.currentTarget.style.borderColor = 'var(--primary)';
+            
+            tg.showPopup({
+                title: 'Выбор тарифа',
+                message: `Выбран тариф за ${amount} рублей`,
+                buttons: [{ type: 'ok' }]
+            });
         }
         
-        // Обработка кнопки назад
+        function processPayment() {
+            tg.showPopup({
+                title: 'Оплата',
+                message: 'Перенаправление на страницу оплаты...',
+                buttons: [{ type: 'ok' }]
+            });
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                tg.showAlert('✅ Платеж успешно обработан! Баланс пополнен.');
+                closeModal('balance-modal');
+            }, 2000);
+        }
+        
+        function saveSettings() {
+            tg.showAlert('✅ Настройки успешно сохранены!');
+            closeModal('settings-modal');
+        }
+        
+        // Back button handler
         tg.BackButton.onClick(() => {
-            tg.close();
+            const openModal = document.querySelector('.modal[style*="display: flex"]');
+            if (openModal) {
+                closeModal(openModal.id);
+            } else {
+                tg.close();
+            }
         });
         
-        // Обработка событий
-        tg.onEvent('viewportChanged', () => {
-            console.log('Viewport changed');
-        });
+        // Add switch styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+            }
+            
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+                border-radius: 24px;
+            }
+            
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 16px;
+                width: 16px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+            
+            input:checked + .slider {
+                background-color: var(--success);
+            }
+            
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+        `;
+        document.head.appendChild(style);
         
-        console.log('Telegram Web App initialized');
+        console.log('🤖 Shapker Bot Web App initialized successfully!');
         console.log('User:', user);
-        console.log('Platform:', tg.platform);
     </script>
 </body>
 </html>
