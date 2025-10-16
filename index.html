@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shapker Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 16px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 20px 0;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .card {
+            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: var(--tg-theme-section-bg-color, #e9ecef);
+            color: var(--tg-theme-text-color, #000000);
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+        
+        .status-active {
+            background: #31b545;
+        }
+        
+        .status-inactive {
+            background: #ff3b30;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 16px 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #6c757d);
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Shapker Bot</h1>
+        <p>Управление вашим бизнес-ботом</p>
+    </div>
+
+    <div class="card">
+        <h3>📊 Статус системы</h3>
+        <div class="status">
+            <div class="status-dot status-active"></div>
+            <span>Бот активен</span>
+        </div>
+        <div class="status">
+            <div class="status-dot status-active"></div>
+            <span>Баланс: <strong id="balance">150 руб.</strong></span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🎯 Основные функции</h3>
+        <ul class="feature-list">
+            <li>✅ Автоответчик</li>
+            <li>✅ Сохранение сообщений</li>
+            <li>✅ Управление бизнес-чатами</li>
+            <li>✅ Магазин товаров</li>
+        </ul>
+    </div>
+
+    <button class="btn" onclick="openSettings()">⚙️ Настройки бота</button>
+    <button class="btn" onclick="openBalance()">💰 Пополнить баланс</button>
+    <button class="btn btn-secondary" onclick="openHelp()">❓ Помощь</button>
+    <button class="btn btn-secondary" onclick="closeApp()">✖️ Закрыть</button>
+
+    <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram.WebApp;
+        
+        // Расширяем на весь экран
+        tg.expand();
+        
+        // Включаем подтверждение закрытия
+        tg.enableClosingConfirmation();
+        
+        // Получаем данные пользователя
+        const user = tg.initDataUnsafe.user;
+        
+        // Показываем кнопку назад
+        tg.BackButton.show();
+        
+        // Обновляем интерфейс с данными пользователя
+        if (user) {
+            document.getElementById('balance').textContent = '150 руб.'; // Заглушка
+        }
+        
+        // Функции для кнопок
+        function openSettings() {
+            tg.showPopup({
+                title: 'Настройки',
+                message: 'Раздел настроек в разработке',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+        
+        function openBalance() {
+            tg.showPopup({
+                title: 'Пополнение баланса',
+                message: 'Для пополнения баланса обратитесь к администратору @username',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+        
+        function openHelp() {
+            tg.openTelegramLink('https://t.me/your_bot?start=help');
+        }
+        
+        function closeApp() {
+            tg.close();
+        }
+        
+        // Обработка кнопки назад
+        tg.BackButton.onClick(() => {
+            tg.close();
+        });
+        
+        // Обработка событий
+        tg.onEvent('viewportChanged', () => {
+            console.log('Viewport changed');
+        });
+        
+        console.log('Telegram Web App initialized');
+        console.log('User:', user);
+        console.log('Platform:', tg.platform);
+    </script>
+</body>
+</html>
